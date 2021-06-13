@@ -1,20 +1,23 @@
-# ChromatographAPI
-層析圖譜自動積分演算法
+if __name__ == '__main__':
+    import sys
+    from os import path
+    sys.path.append( path.dirname(path.dirname( path.abspath(__file__) ) ))
 
-## 目錄
-* [Overview](#Overview)
-* [使用說明](#使用說明)
-* [參數調整](#參數調整與設定)
+from lib.OpenChromFile import openTXT
+
+# --------  主要使用的模組 -----------------
+from lib.ChromAPI import Chromatograph
+from lib.ChromCanvas import ChromatographCanvas as chromCanvas
+# -----------------------------------------
 
 
-## Overview
-![]()
+# ----- 開啟圖譜紀錄檔案 -----
+# 依據需求去修改開啟不同的測試圖譜檔案
+# 最後彙整成兩筆 list 資料, 分別為 time signal
+from os import path
+file_path = path.dirname( path.abspath(__file__) ) + "\\test data\\test data.txt"
+time, signal = openTXT( file_path )
 
-## 使用說明
----
-- 簡單幾個步驟進行圖譜的前處理, 並進行層析峰的辨識與積分
-
-```python
 # ----- 建立圖譜物件 -----
 chrom = Chromatograph( time, signal )
 # ----- 平滑處理與慮波 -----
@@ -30,10 +33,8 @@ chrom.SmoothDerivative( window_size=101, alpha=1.5)
 chrom.PeakDetection(k = 10, tail_factor = 0.1)
 # 利用圖譜訊號與積線間的"訊雜比"來過濾 baseline 上的雜訊
 chrom.peakHeightFilter(1.2)
-```
 
-- 可以搭配 Pandas 模組儲存與顯示計算結果
-```python
+# ----- print 積分結果 -----
 import pandas as pd
 header = [
     "Retention Time","Peak Height", "Peak Width", "Integral Area",
@@ -46,17 +47,7 @@ for peak in chrom.peak_list:
 
 df = pd.DataFrame(data, columns = header)
 print(df)
-```
-|#|Retention Time|Peak Height|Peak Width|Integral Area|N|Asymmetry|Tail Factor|
-|:---:|---:|---:|---:|---:|---:|---:|---:|
-|0|18.014252|29.704051|0.38350|1.664753|369533.497421|1.543269|1.307531|
-|1|19.572502|33.643070|0.53100|2.252944|317560.837030|1.261194|1.155738|
-|2|20.675002|35.067787|0.36725|2.308078|379443.140482|1.314961|1.179310|
-|3|22.202002|22.092597|0.34925|1.311811|394026.615683|2.976744|2.072917|
-
-- ChromCanvas 把Matplotlib模組進行再包裝, 使積分計算結果可以簡易呈現
-
-```python
+#---------------------------
 # ----- 針對圖譜進行繪圖 -----
 canvas = chromCanvas()
 canvas.drawChromatograph(chrom)
@@ -65,13 +56,26 @@ canvas.drawAllPeaks( chrom.peak_list ) # 標記全部的peak
 for peak in chrom.peak_list: 
     canvas.drawSinglePeak( chrom, peak ) # 針對 peak 區域進行繪圖
 canvas.show() # 顯示圖譜
-```
-![]()
 
 
-## 參數調整與設定
----
-Tail Factor 影響
-![]()
 
-##
+'''
+# ----- 輸出特定區段的 peak 資料 -------
+# 取第六根 peak 區段出來並 plot
+# 編號從 0 開始
+peak = chrom.peak_list[5]
+
+# boundary_index 儲存了peak邊界在整個圖譜資料(list or arrray)的編號位置
+front_index = peak.boundary_index[0] # Peak 起始點編號
+back_index = peak.boundary_index[1] # Peak 終點編號
+
+time_piece = chrom.time[ front_index: back_index ] # 取出區間時間的資料
+signal_piece = chrom.signal[ front_index: back_index ] # 取出區間訊號的資料
+baseline_piece = chrom.baseline[ front_index: back_index ] # 取出區間基線的資料
+
+import matplotlib.pyplot as plt
+plt.figure()
+plt.plot(time_piece, signal_piece)
+plt.plot(time_piece, baseline_piece)
+plt.show()
+'''
