@@ -8,7 +8,7 @@
 
 
 ## Overview
-![]()
+![](https://github.com/WenShaoPang/ChromatographAPI/blob/main/pic/overview.png)
 
 ## 使用說明
 ---
@@ -66,12 +66,12 @@ for peak in chrom.peak_list:
     canvas.drawSinglePeak( chrom, peak ) # 針對 peak 區域進行繪圖
 canvas.show() # 顯示圖譜
 ```
-![]()
+![](https://github.com/WenShaoPang/ChromatographAPI/blob/main/pic/pic2.png)
 
 
 ## 參數調整與設定
 ---
 Tail Factor 影響
-![]()
+![](https://github.com/WenShaoPang/ChromatographAPI/blob/main/pic/tail_factor.png)
 
 ##
